@@ -27,8 +27,16 @@ class RedisConnection {
   }
 
   /// connect on Redis server as client
-  Future<Command> connectSecure(host, port) {
-    return SecureSocket.connect(host, port).then((SecureSocket sock) {
+  Future<Command> connectSecure(
+    host,
+    port, {
+    bool Function(X509Certificate)? onBadCertificate,
+  }) {
+    return SecureSocket.connect(
+      host,
+      port,
+      onBadCertificate: onBadCertificate,
+    ).then((SecureSocket sock) {
       _socket = sock;
       disable_nagle(true);
       _stream = LazyStream.fromstream(_socket!);
@@ -71,7 +79,7 @@ class RedisConnection {
   }
 
   // ignore: unused_element
-  Future _sendraw(Parser parser,List<int> data) {
+  Future _sendraw(Parser parser, List<int> data) {
     _socket!.add(data);
     return _senddummy(parser);
   }
